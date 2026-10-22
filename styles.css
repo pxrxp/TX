@@ -14,6 +14,24 @@
   animation: cursorBlink 1s infinite;
 }
 
+.lever-arm-group {
+  transform-origin: 209px 109px;
+  transition: transform 0.04s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+body.key-pressed .lever-arm-group {
+  transform: rotate(1.2deg) translateY(2px);
+}
+
+.spark-burst {
+  opacity: 0;
+  transition: opacity 0.03s ease-out;
+}
+
+body.key-pressed .spark-burst {
+  opacity: 1;
+}
+
 /* Custom scrollbar styling for teleprinter message feed */
 #chat-stream::-webkit-scrollbar {
   width: 5px;
