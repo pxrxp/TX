@@ -34,6 +34,71 @@ export class NetworkManager {
     });
   }
 
+  // MQTT Presence logic to reserve unique callsigns
+  async checkCallsignAvailability(room, callsign) {
+    if (!this.client || !this.client.connected) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    return new Promise((resolve) => {
+      const pingTopic = `tx/${room}/presence/ping`;
+      const claimTopic = `tx/${room}/presence/claim`;
+      let isTaken = false;
+
+      const handler = (topic, payload) => {
+        if (topic === claimTopic) {
+          try {
+            const msg = JSON.parse(payload.toString());
+            if (msg.callsign && msg.callsign.toLowerCase() === callsign.toLowerCase()) {
+              isTaken = true;
+            }
+          } catch (e) { }
+        }
+      };
+
+      this.client.subscribe(claimTopic);
+      this.client.on('message', handler);
+
+      // Query active peers in target channel
+      this.client.publish(pingTopic, JSON.stringify({ query: callsign }));
+
+      setTimeout(() => {
+        this.client.unsubscribe(claimTopic);
+        this.client.removeListener('message', handler);
+        resolve(!isTaken);
+      }, 450);
+    });
+  }
+
+  joinRoom(room, callsign) {
+    if (this.room && this.client) {
+      this.client.unsubscribe(`tx/${this.room}/signal`);
+      this.client.unsubscribe(`tx/${this.room}/chat`);
+      this.client.unsubscribe(`tx/${this.room}/presence/ping`);
+    }
+
+    this.room = room;
+    this.callsign = callsign;
+
+    if (this.client) {
+      this.client.subscribe(`tx/${this.room}/signal`);
+      this.client.subscribe(`tx/${this.room}/chat`);
+      this.client.subscribe(`tx/${this.room}/presence/ping`);
+
+      // Answer incoming callsign availability queries
+      this.client.on('message', (topic, payload) => {
+        if (topic === `tx/${this.room}/presence/ping`) {
+          try {
+            const data = JSON.parse(payload.toString());
+            if (data.query && data.query.toLowerCase() === this.callsign.toLowerCase()) {
+              this.client.publish(`tx/${this.room}/presence/claim`, JSON.stringify({ callsign: this.callsign }));
+            }
+          } catch (e) { }
+        }
+      });
+    }
+  }
+
   sendSignal(action, callsign) {
     if (this.client && this.client.connected) {
       const topic = `tx/${this.room}/signal`;
