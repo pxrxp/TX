@@ -64,575 +64,176 @@
       "
     ></div>
 
-    <!-- Bottom Telegraph Deck -->
-    <footer
-      class="w-full relative shrink-0 z-20"
-      style="background: transparent"
+    <!-- VIEW 1: STATION ENTRY LANDING SCREEN -->
+    <main
+      id="station-landing-view"
+      class="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4"
     >
-      <div class="w-full max-w-4xl mx-auto px-4 sm:px-8 pb-3 pt-2">
-        <div
-          class="w-full rounded-2xl relative overflow-hidden select-none flex flex-col"
-          style="
-            background: linear-gradient(
-              135deg,
-              rgba(255, 255, 255, 0.08) 0%,
-              rgba(20, 24, 33, 0.45) 100%
-            );
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow:
-              rgba(255, 255, 255, 0.2) 0px 1px 1px 0px inset,
-              rgba(0, 0, 0, 0.5) 0px 12px 32px -4px;
-          "
-        >
-          <!-- Full Straight Key SVG Apparatus -->
-          <div
-            id="telegraph-key-bed"
-            class="w-full relative px-2 sm:px-6 pt-1 pb-3 flex items-center justify-center cursor-pointer select-none"
+      <div class="flex flex-col items-center select-none w-full max-w-md">
+        <div class="flex items-center justify-center mb-8 text-center">
+          <h1
+            class="text-6xl sm:text-7xl font-black font-['Outfit'] tracking-tight text-white flex items-baseline leading-none"
           >
+            tx<span class="relative inline-flex items-baseline"
+              ><span
+                class="relative text-[#ffc665] leading-none inline-block z-10"
+                style="
+                  text-shadow:
+                    0 0 10px #ffc665,
+                    0 0 24px #e5a93c,
+                    0 0 42px rgba(229, 169, 60, 0.95),
+                    0 0 60px rgba(245, 158, 11, 0.8);
+                "
+                >.</span
+              ><span
+                class="absolute left-1/2 bottom-[0.16em] -translate-x-1/2 translate-y-1/2 w-16 h-16 rounded-full pointer-events-none z-0"
+                style="
+                  background: radial-gradient(
+                    circle,
+                    rgba(229, 169, 60, 0.95) 0%,
+                    rgba(229, 169, 60, 0.55) 35%,
+                    rgba(229, 169, 60, 0) 75%
+                  );
+                  filter: blur(6px);
+                "
+              ></span
+            ></span>
+          </h1>
+        </div>
+        <div
+          class="w-full bg-black/55 backdrop-blur-md rounded-2xl p-7 shadow-2xl flex flex-col gap-5 relative border border-white/10"
+        >
+          <div class="flex flex-col gap-3.5">
             <div
-              class="w-full h-[165px] sm:h-[180px] relative flex items-center justify-center"
+              class="group flex items-center gap-3.5 bg-zinc-900/85 rounded-xl px-4 py-3.5 border border-transparent focus-within:border-[#e5a93c]/60 focus-within:shadow-[0_0_14px_rgba(229,169,60,0.2)] transition-all"
             >
               <svg
-                id="telegraph-svg"
-                class="w-full h-full max-h-[180px] overflow-visible"
+                class="w-6 h-6 flex-shrink-0 text-white group-focus-within:text-[#e5a93c] transition-colors"
                 fill="none"
-                viewBox="0 0 920 220"
-                xmlns="http://www.w3.org/2000/svg"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                viewBox="0 0 24 24"
               >
-                <defs>
-                  <linearGradient id="slate-bed" x1="0" x2="0" y1="0" y2="1">
-                    <stop
-                      offset="0%"
-                      stop-color="#181c24"
-                      stop-opacity="0.75"
-                    />
-                    <stop
-                      offset="40%"
-                      stop-color="#101319"
-                      stop-opacity="0.65"
-                    />
-                    <stop
-                      offset="90%"
-                      stop-color="#0a0c10"
-                      stop-opacity="0.7"
-                    />
-                    <stop
-                      offset="100%"
-                      stop-color="#06080a"
-                      stop-opacity="0.8"
-                    />
-                  </linearGradient>
-                  <linearGradient
-                    id="brass-lever-beam"
-                    x1="160"
-                    x2="820"
-                    y1="110"
-                    y2="110"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop offset="0%" stop-color="#7a5518" />
-                    <stop offset="18%" stop-color="#c99328" />
-                    <stop offset="38%" stop-color="#f5d378" />
-                    <stop offset="55%" stop-color="#d4a034" />
-                    <stop offset="80%" stop-color="#e5a93c" />
-                    <stop offset="100%" stop-color="#8c621d" />
-                  </linearGradient>
-                  <linearGradient id="brass-column" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#f5d378" />
-                    <stop offset="28%" stop-color="#e5a93c" />
-                    <stop offset="68%" stop-color="#c99328" />
-                    <stop offset="100%" stop-color="#634410" />
-                  </linearGradient>
-                  <linearGradient
-                    id="knurl-pattern"
-                    x1="0"
-                    x2="1"
-                    y1="0"
-                    y2="0"
-                  >
-                    <stop offset="0%" stop-color="#996f1b" />
-                    <stop offset="25%" stop-color="#f5d378" />
-                    <stop offset="50%" stop-color="#c99328" />
-                    <stop offset="75%" stop-color="#fadc7d" />
-                    <stop offset="100%" stop-color="#6e4d13" />
-                  </linearGradient>
-                  <radialGradient id="bakelite-top" cx="45%" cy="35%" r="65%">
-                    <stop offset="0%" stop-color="#383c44" />
-                    <stop offset="25%" stop-color="#1c1f24" />
-                    <stop offset="70%" stop-color="#0c0e11" />
-                    <stop offset="100%" stop-color="#030405" />
-                  </radialGradient>
-                  <radialGradient id="spark-glow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#ffffff" />
-                    <stop offset="30%" stop-color="#ffe483" />
-                    <stop
-                      offset="70%"
-                      stop-color="#e5a93c"
-                      stop-opacity="0.9"
-                    />
-                    <stop offset="100%" stop-color="#d4a034" stop-opacity="0" />
-                  </radialGradient>
-                  <filter
-                    id="drop-heavy"
-                    x="-15%"
-                    y="-15%"
-                    width="130%"
-                    height="145%"
-                  >
-                    <feDropShadow
-                      dx="0"
-                      dy="5"
-                      stdDeviation="6"
-                      flood-color="#000000"
-                      flood-opacity="0.85"
-                    />
-                  </filter>
-                </defs>
-                <g filter="url(#drop-heavy)">
-                  <rect
-                    x="40"
-                    y="30"
-                    width="840"
-                    height="155"
-                    rx="8"
-                    fill="#07080a"
-                    stroke="#1d222b"
-                    stroke-width="1.5"
-                  />
-                  <rect
-                    x="45"
-                    y="34"
-                    width="830"
-                    height="145"
-                    rx="6"
-                    fill="url(#slate-bed)"
-                    stroke="#14171d"
-                    stroke-width="1"
-                  />
-                  <line
-                    x1="55"
-                    y1="36"
-                    x2="865"
-                    y2="36"
-                    stroke="#3e4554"
-                    stroke-opacity="0.25"
-                    stroke-width="1"
-                  />
-                </g>
-                <g opacity="0.85">
-                  <circle
-                    cx="68"
-                    cy="52"
-                    r="4.5"
-                    fill="#a47729"
-                    stroke="#3b290d"
-                    stroke-width="1"
-                  />
-                  <line
-                    x1="65"
-                    y1="52"
-                    x2="71"
-                    y2="52"
-                    stroke="#261b09"
-                    stroke-width="1"
-                  />
-                  <circle
-                    cx="68"
-                    cy="162"
-                    r="4.5"
-                    fill="#a47729"
-                    stroke="#3b290d"
-                    stroke-width="1"
-                  />
-                  <line
-                    x1="68"
-                    y1="159"
-                    x2="68"
-                    y2="165"
-                    stroke="#261b09"
-                    stroke-width="1"
-                  />
-                  <circle
-                    cx="852"
-                    cy="52"
-                    r="4.5"
-                    fill="#a47729"
-                    stroke="#3b290d"
-                    stroke-width="1"
-                  />
-                  <line
-                    x1="849"
-                    y1="50"
-                    x2="855"
-                    y2="54"
-                    stroke="#261b09"
-                    stroke-width="1"
-                  />
-                  <circle
-                    cx="852"
-                    cy="162"
-                    r="4.5"
-                    fill="#a47729"
-                    stroke="#3b290d"
-                    stroke-width="1"
-                  />
-                  <line
-                    x1="849"
-                    y1="164"
-                    x2="855"
-                    y2="160"
-                    stroke="#261b09"
-                    stroke-width="1"
-                  />
-                </g>
-                <g filter="url(#drop-heavy)">
-                  <rect
-                    x="110"
-                    y="52"
-                    width="16"
-                    height="20"
-                    rx="2"
-                    fill="url(#knurl-pattern)"
-                    stroke="#4a3717"
-                    stroke-width="0.8"
-                  />
-                  <circle
-                    cx="118"
-                    cy="48"
-                    r="7"
-                    fill="url(#brass-column)"
-                    stroke="#3e2c0e"
-                    stroke-width="1"
-                  />
-                  <circle cx="118" cy="48" r="3" fill="#211707" />
-                  <rect
-                    x="110"
-                    y="142"
-                    width="16"
-                    height="20"
-                    rx="2"
-                    fill="url(#knurl-pattern)"
-                    stroke="#4a3717"
-                    stroke-width="0.8"
-                  />
-                  <circle
-                    cx="118"
-                    cy="138"
-                    r="7"
-                    fill="url(#brass-column)"
-                    stroke="#3e2c0e"
-                    stroke-width="1"
-                  />
-                  <circle cx="118" cy="138" r="3" fill="#211707" />
-                  <path
-                    d="M125 60 C 150 75, 160 90, 190 100"
-                    fill="none"
-                    opacity="0.65"
-                    stroke="#b86d2f"
-                    stroke-linecap="round"
-                    stroke-width="2.2"
-                  />
-                </g>
-                <g filter="url(#drop-heavy)">
-                  <rect
-                    x="145"
-                    y="96"
-                    width="16"
-                    height="24"
-                    rx="2"
-                    fill="url(#brass-column)"
-                    stroke="#3f2d12"
-                    stroke-width="0.8"
-                  />
-                  <rect
-                    x="139"
-                    y="103"
-                    width="28"
-                    height="10"
-                    rx="2"
-                    fill="url(#knurl-pattern)"
-                    stroke="#523912"
-                    stroke-width="0.8"
-                  />
-                  <circle
-                    cx="137"
-                    cy="108"
-                    r="5"
-                    fill="#fadc7d"
-                    stroke="#523912"
-                    stroke-width="0.8"
-                  />
-                  <rect
-                    x="195"
-                    y="72"
-                    width="28"
-                    height="74"
-                    rx="3"
-                    fill="url(#brass-column)"
-                    stroke="#38260b"
-                    stroke-width="1"
-                  />
-                  <circle
-                    cx="209"
-                    cy="109"
-                    r="7.5"
-                    fill="#eac368"
-                    stroke="#3b2708"
-                    stroke-width="1.2"
-                  />
-                  <line
-                    x1="204"
-                    y1="109"
-                    x2="214"
-                    y2="109"
-                    stroke="#3b2708"
-                    stroke-width="1.5"
-                  />
-                  <rect
-                    x="191"
-                    y="104"
-                    width="36"
-                    height="10"
-                    rx="2"
-                    fill="url(#knurl-pattern)"
-                    stroke="#3f2c0d"
-                    stroke-width="0.8"
-                  />
-                </g>
-                <g>
-                  <rect
-                    x="526"
-                    y="118"
-                    width="18"
-                    height="16"
-                    rx="2"
-                    fill="url(#brass-column)"
-                    stroke="#453110"
-                    stroke-width="0.8"
-                  />
-                  <rect
-                    x="531"
-                    y="114"
-                    width="8"
-                    height="5"
-                    rx="1"
-                    fill="#f0ebe1"
-                    stroke="#857a66"
-                    stroke-width="0.8"
-                  />
-                  <circle
-                    cx="535"
-                    cy="115"
-                    r="13"
-                    fill="url(#spark-glow)"
-                    class="spark-burst pointer-events-none"
-                  />
-                </g>
-                <g opacity="0.85">
-                  <ellipse cx="400" cy="120" rx="9" ry="3" fill="#8c6a2e" />
-                  <path
-                    d="M392 120 Q400 115 408 120 T392 114 Q400 109 408 114"
-                    fill="none"
-                    stroke="#d6a543"
-                    stroke-linecap="round"
-                    stroke-width="2.5"
-                  />
-                </g>
-                <g id="lever-assembly" class="lever-arm-group">
-                  <g filter="url(#drop-heavy)">
-                    <path
-                      d="M150 106 L210 104 L210 114 L150 112 Z"
-                      fill="url(#brass-lever-beam)"
-                      stroke="#573e16"
-                      stroke-width="0.8"
-                    />
-                    <path
-                      d="M205 103 L700 98 Q712 98 712 109 Q712 120 700 120 L205 115 Z"
-                      fill="url(#brass-lever-beam)"
-                      stroke="#ffd77a"
-                      stroke-width="1"
-                    />
-                    <line
-                      x1="210"
-                      y1="109"
-                      x2="695"
-                      y2="109"
-                      stroke="#fff5d0"
-                      stroke-opacity="0.45"
-                      stroke-width="1.2"
-                    />
-                  </g>
-                  <g filter="url(#drop-heavy)">
-                    <rect
-                      x="393"
-                      y="70"
-                      width="14"
-                      height="28"
-                      rx="2"
-                      fill="url(#brass-column)"
-                      stroke="#453110"
-                      stroke-width="0.8"
-                    />
-                    <rect
-                      x="386"
-                      y="76"
-                      width="28"
-                      height="9"
-                      rx="1.5"
-                      fill="url(#knurl-pattern)"
-                      stroke="#47320f"
-                      stroke-width="0.8"
-                    />
-                    <circle
-                      cx="400"
-                      cy="67"
-                      r="5"
-                      fill="#f8d676"
-                      stroke="#47320f"
-                      stroke-width="0.8"
-                    />
-                  </g>
-                  <g>
-                    <rect
-                      x="526"
-                      y="104"
-                      width="18"
-                      height="9"
-                      rx="1.5"
-                      fill="url(#brass-column)"
-                      stroke="#3e2c0e"
-                      stroke-width="0.8"
-                    />
-                    <rect
-                      x="531"
-                      y="111"
-                      width="8"
-                      height="4"
-                      rx="1"
-                      fill="#ffffff"
-                      stroke="#998e7d"
-                      stroke-width="0.8"
-                    />
-                    <rect
-                      x="529"
-                      y="74"
-                      width="12"
-                      height="26"
-                      rx="2"
-                      fill="url(#brass-column)"
-                      stroke="#422f10"
-                      stroke-width="0.8"
-                    />
-                    <rect
-                      x="523"
-                      y="78"
-                      width="24"
-                      height="8"
-                      rx="1.5"
-                      fill="url(#knurl-pattern)"
-                      stroke="#47320f"
-                      stroke-width="0.8"
-                    />
-                    <circle
-                      cx="535"
-                      cy="71"
-                      r="4.5"
-                      fill="#f8d676"
-                      stroke="#47320f"
-                      stroke-width="0.8"
-                    />
-                  </g>
-                  <g class="knob-press-target" filter="url(#drop-heavy)">
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="42"
-                      fill="none"
-                      stroke="url(#brass-lever-beam)"
-                      stroke-width="3"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="39"
-                      fill="#916523"
-                      stroke="#e0b153"
-                      stroke-width="1"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="36"
-                      fill="url(#bakelite-top)"
-                      stroke="#1c2027"
-                      stroke-width="1.8"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="33"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.06)"
-                      stroke-width="1"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="28"
-                      fill="url(#bakelite-top)"
-                      stroke="#090b0e"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="22"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.07)"
-                      stroke-width="1"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="15"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.04)"
-                      stroke-width="1"
-                    />
-                    <ellipse
-                      cx="744"
-                      cy="98"
-                      fill="rgba(255,255,255,0.22)"
-                      rx="11"
-                      ry="5"
-                      transform="rotate(-15 744 98)"
-                    />
-                    <ellipse
-                      cx="740"
-                      cy="96"
-                      fill="rgba(255,255,255,0.4)"
-                      rx="4"
-                      ry="1.8"
-                      transform="rotate(-15 740 96)"
-                    />
-                    <circle
-                      cx="750"
-                      cy="109"
-                      r="4.5"
-                      fill="#fcdb77"
-                      stroke="#704e18"
-                      stroke-width="1.2"
-                    />
-                    <circle cx="750" cy="109" r="1.5" fill="#2d1c04" />
-                  </g>
-                </g>
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
               </svg>
+              <input
+                id="callsign-input"
+                class="w-full bg-transparent text-white group-focus-within:text-[#e5a93c] placeholder:text-zinc-500 font-['Outfit'] font-semibold text-base sm:text-[17px] tracking-wide focus:outline-none lowercase transition-colors border-none p-0 focus:ring-0"
+                maxlength="16"
+                placeholder="callsign"
+                type="text"
+                value="stn-74"
+              />
             </div>
+            <div
+              class="group flex items-center gap-3.5 bg-zinc-900/85 rounded-xl px-4 py-3.5 border border-transparent focus-within:border-[#e5a93c]/60 focus-within:shadow-[0_0_14px_rgba(229,169,60,0.2)] transition-all"
+            >
+              <svg
+                class="w-6 h-6 flex-shrink-0 text-white group-focus-within:text-[#e5a93c] transition-colors"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                viewBox="0 0 24 24"
+              >
+                <line x1="4" x2="20" y1="9" y2="9"></line>
+                <line x1="4" x2="20" y1="15" y2="15"></line>
+                <line x1="10" x2="8" y1="3" y2="21"></line>
+                <line x1="16" x2="14" y1="3" y2="21"></line>
+              </svg>
+              <input
+                id="room-input"
+                class="w-full bg-transparent text-white group-focus-within:text-[#e5a93c] placeholder:text-zinc-500 font-['Outfit'] font-semibold text-base sm:text-[17px] tracking-wide focus:outline-none lowercase transition-colors border-none p-0 focus:ring-0"
+                maxlength="16"
+                placeholder="channel"
+                type="text"
+                value="wire-01"
+              />
+              <button
+                id="randomize-btn"
+                aria-label="randomize channel"
+                class="text-white hover:text-[#e5a93c] transition-colors flex items-center justify-center p-1 active:scale-95 rounded-md hover:bg-white/5 cursor-pointer"
+                title="randomize channel"
+                type="button"
+              >
+                <svg
+                  class="w-5 h-5 text-white hover:text-[#e5a93c] transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <polyline points="16 3 21 3 21 8"></polyline>
+                  <line x1="4" x2="21" y1="20" y2="3"></line>
+                  <polyline points="21 16 21 21 16 21"></polyline>
+                  <line x1="15" x2="21" y1="15" y2="21"></line>
+                  <line x1="4" x2="9" y1="4" y2="9"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="landing-error"
+            class="hidden text-rose-400 font-mono text-xs text-center font-semibold -mt-1 lowercase"
+          ></div>
+
+          <div class="flex items-center justify-between pt-1">
+            <button
+              id="toggle-cipher-btn"
+              aria-label="toggle cipher guide"
+              class="w-11 h-11 flex items-center justify-center text-white hover:text-[#e5a93c] hover:bg-white/5 rounded-xl active:scale-95 transition cursor-pointer bg-transparent border-none p-0"
+              title="morse cipher sheet"
+              type="button"
+            >
+              <svg
+                class="w-7 h-7 stroke-current"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.3"
+                viewBox="0 0 24 24"
+              >
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path
+                  d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                ></path>
+                <line x1="8" x2="16" y1="7" y2="7"></line>
+                <line x1="8" x2="13" y1="11" y2="11"></line>
+              </svg>
+            </button>
+            <button
+              id="connect-btn"
+              aria-label="enter station"
+              class="bg-gradient-to-br from-amber-400 to-amber-600 rounded-full w-14 h-14 flex items-center justify-center shadow-lg active:scale-95 hover:scale-105 transition cursor-pointer"
+              style="box-shadow: 0 0 24px rgba(229, 169, 60, 0.45)"
+              type="button"
+            >
+              <svg
+                id="connect-icon"
+                class="w-7 h-7 text-white stroke-current drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="3"
+                viewBox="0 0 24 24"
+              >
+                <line x1="5" x2="19" y1="12" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
-    </footer>
+    </main>
 
     <script type="module" src="js/app.js"></script>
   </body>
