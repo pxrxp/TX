@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tx — telegraph wire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body
+    class="bg-[#090a0d] dark-vignette text-[#f0f2f5] font-sans h-screen w-screen flex flex-col justify-between overflow-hidden antialiased selection:bg-[#ffbe44]/20 selection:text-[#ffbe44]"
+    style="background-color: rgb(7, 9, 11)"
+  >
+    <!-- Ambient Background Overlays -->
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 bg-cover bg-no-repeat bg-bottom"
+        style="
+          background-image: url(&quot;assets/bg.jpg&quot;);
+          filter: blur(4px);
+          transform: scale(1.06);
+          transform-origin: center center 0px;
+        "
+      ></div>
+      <div
+        class="absolute inset-0"
+        style="
+          background: radial-gradient(
+            85% 90% at 50% 88%,
+            rgba(16, 20, 27, 0.45) 0%,
+            rgba(10, 12, 16, 0.72) 50%,
+            rgba(7, 9, 11, 0.92) 80%,
+            rgb(7, 9, 11) 100%
+          );
+        "
+      ></div>
+    </div>
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 pointer-events-none z-0 bg-[#07090b]/85 backdrop-blur-md"
+      style="
+        mask-image: radial-gradient(
+          80% 90% at 50% 88%,
+          rgba(0, 0, 0, 0.15) 0%,
+          rgba(0, 0, 0, 0.45) 46%,
+          rgba(0, 0, 0, 0.82) 78%,
+          rgba(0, 0, 0, 0.95) 100%
+        );
+        background: radial-gradient(
+          circle at 50% 80%,
+          rgba(5, 7, 9, 0.35) 0%,
+          rgba(7, 9, 11, 0.88) 100%
+        );
+      "
+    ></div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
