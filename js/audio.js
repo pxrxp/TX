@@ -19,7 +19,8 @@ export class AudioEngine {
 
     this.osc.type = 'sine';
     this.osc.frequency.setValueAtTime(this.frequency, this.ctx.currentTime);
-
+    
+    // Initial silent gain
     this.gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
 
     this.osc.connect(this.gainNode);
@@ -39,14 +40,28 @@ export class AudioEngine {
     if (!this.ctx) this.init();
     if (this.ctx.state === 'suspended') this.ctx.resume();
 
-    this.gainNode.gain.setValueAtTime(0.18, this.ctx.currentTime);
+    const now = this.ctx.currentTime;
+    
+    // Cancel scheduled gain drops to prevent clicks on rapid re-press
+    this.gainNode.gain.cancelScheduledValues(now);
+    
+    // Smooth ~5ms attack ramp to avoid audio popping
+    this.gainNode.gain.setValueAtTime(this.gainNode.gain.value, now);
+    this.gainNode.gain.linearRampToValueAtTime(0.18, now + 0.005);
     this.isActive = true;
   }
 
   stopTone() {
     if (!this.ctx || !this.isActive) return;
 
-    this.gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
+    const now = this.ctx.currentTime;
+    
+    // Smooth ~12ms exponential release decay to avoid sudden cutoffs
+    this.gainNode.gain.cancelScheduledValues(now);
+    this.gainNode.gain.setValueAtTime(this.gainNode.gain.value, now);
+    this.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+    this.gainNode.gain.setValueAtTime(0, now + 0.013);
+    
     this.isActive = false;
   }
 
