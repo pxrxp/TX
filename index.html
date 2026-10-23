@@ -18,7 +18,7 @@
     class="bg-[#090a0d] dark-vignette text-[#f0f2f5] font-sans h-screen w-screen flex flex-col justify-between overflow-hidden antialiased selection:bg-[#ffbe44]/20 selection:text-[#ffbe44]"
     style="background-color: rgb(7, 9, 11)"
   >
-    <!-- Ambient Background Overlays -->
+    <!-- Ambient background overlays -->
     <div
       aria-hidden="true"
       class="fixed inset-0 pointer-events-none z-0 overflow-hidden"
@@ -64,7 +64,7 @@
       "
     ></div>
 
-    <!-- Settings Overlay Menu -->
+    <!-- Settings overlay panel -->
     <aside
       id="settings-panel"
       aria-label="Settings"
@@ -116,7 +116,7 @@
         <div
           class="flex flex-col gap-3.5 font-['Outfit'] text-[13px] sm:text-sm pt-0.5"
         >
-          <!-- Your Tone -->
+          <!-- Tone controls -->
           <div
             class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
           >
@@ -143,7 +143,6 @@
             />
           </div>
 
-          <!-- Peer Tone -->
           <div
             class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
           >
@@ -170,7 +169,7 @@
             />
           </div>
 
-          <!-- Your Speed -->
+          <!-- Speed controls -->
           <div
             class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
           >
@@ -197,7 +196,6 @@
             />
           </div>
 
-          <!-- Peer Speed -->
           <div
             class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
           >
@@ -224,7 +222,7 @@
             />
           </div>
 
-          <!-- Auto-Send Delay (Default 2.0s) -->
+          <!-- Auto-send delay -->
           <div
             class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
           >
@@ -251,7 +249,7 @@
             />
           </div>
 
-          <!-- Translation Toggle -->
+          <!-- Translation mode -->
           <div
             class="flex items-center justify-between pb-2.5 border-b border-white/[0.06]"
           >
@@ -279,7 +277,7 @@
             </div>
           </div>
 
-          <!-- Time Mode -->
+          <!-- Time mode -->
           <div class="flex items-center justify-between pt-0.5">
             <span class="text-zinc-200 font-semibold lowercase">time</span>
             <div
@@ -306,7 +304,7 @@
       </div>
     </aside>
 
-    <!--  Landing Screen -->
+    <!-- Station entry landing view -->
     <main
       id="station-landing-view"
       class="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4"
@@ -477,7 +475,7 @@
       </div>
     </main>
 
-    <!-- Active Telegraph Deck -->
+    <!-- Active telegraph deck view -->
     <div
       id="wire-active-view"
       class="hidden h-screen w-screen flex-col justify-between overflow-hidden"
@@ -575,7 +573,7 @@
         </div>
       </header>
 
-      <!-- Chat Feed Stream -->
+      <!-- Chat feed stream -->
       <main
         class="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-end px-6 sm:px-10 pt-20 pb-4 overflow-hidden z-10"
       >
@@ -585,7 +583,7 @@
         ></div>
       </main>
 
-      <!-- Bottom Telegraph Deck -->
+      <!-- Bottom telegraph deck -->
       <footer
         class="w-full relative shrink-0 z-20"
         style="background: transparent"
@@ -729,7 +727,7 @@
               </div>
             </div>
 
-            <!-- Full Straight Key SVG Apparatus -->
+            <!-- Telegraph key bed SVG -->
             <div
               id="telegraph-key-bed"
               class="w-full relative px-2 sm:px-6 pt-1 pb-3 flex items-center justify-center cursor-pointer select-none"
