@@ -17,21 +17,14 @@ Join a channel, tap out a message, and see what comes back. You can watch the te
 
 ## Features
 
-- **Live chat:** Send Morse and hear what other people are sending.
-- **Audio:** Hear a sidetone as you key.
-- **Decoder:** See the dots and dashes, translated text, and estimated WPM.
-- **Listening practice:** Hide the translated text and work out messages by ear.
-- **Morse chart:** Look up letters, numbers, and other characters when you forget one.
-- **Settings:** Change the tone, decoder speed, and delay before a message is sent.
+- Chat with others using Morse code.
+- Hear your keying through a sidetone.
+- See the dits, dahs, decoded text, and WPM as you send.
+- Hide the translated text and try copying messages by ear.
+- Look up letters, numbers, and symbols in the Morse chart.
+- Adjust the sidetone pitch, decoder WPM, and auto-send delay.
 
 ## Controls
-
-| Control | What it does |
-| --- | --- |
-| Spacebar | Key Morse |
-| Click or tap | Use the keyer |
-| Cipher sheet button | Open the Morse chart |
-| Translation toggle | Show or hide decoded text |
 
 Short presses make dits; longer presses make dahs. The decoder uses the length of your key presses and the gaps between them to work out the characters.
 
