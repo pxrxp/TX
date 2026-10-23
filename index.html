@@ -64,6 +64,207 @@
       "
     ></div>
 
+    <!-- Morse code cipher reference overlay -->
+    <aside
+      id="top-morse-panel"
+      aria-label="Morse Code Cipher Reference"
+      class="fixed top-5 left-0 right-0 mx-auto z-50 w-[calc(100%-2rem)] max-w-4xl transition-all duration-300 hidden"
+    >
+      <div
+        class="relative w-full rounded-2xl px-6 py-7 sm:py-8 text-[#f0f2f5] flex flex-col gap-4 sm:gap-5"
+        style="
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(20, 24, 33, 0.45) 100%
+          );
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow:
+            rgba(255, 255, 255, 0.2) 0px 1px 1px 0px inset,
+            rgba(0, 0, 0, 0.5) 0px 12px 32px -4px;
+        "
+      >
+        <div
+          class="flex items-center justify-between w-full border-b border-white/[0.08] pb-3"
+        >
+          <span
+            id="auto-send-hint"
+            class="text-zinc-300 font-mono text-xs sm:text-sm lowercase font-medium"
+            >press [spacebar] or tap key to send</span
+          >
+          <button
+            id="close-cipher-btn"
+            aria-label="close instructions"
+            class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition cursor-pointer flex-shrink-0"
+            type="button"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" x2="6" y1="6" y2="18"></line>
+              <line x1="6" x2="18" y1="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div
+          class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-x-4 gap-y-3.5 font-mono text-[13px] sm:text-sm select-none pt-1.5 pb-1"
+        >
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">a</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">b</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—···</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">c</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—·—·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">d</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—··</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">e</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">f</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">··—·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">g</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">——·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">h</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">····</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">i</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">··</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">j</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·———</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">k</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—·—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">l</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·—··</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">m</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">——</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">n</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">o</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">———</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">p</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·——·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">q</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">——·—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">r</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·—·</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">s</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">···</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">t</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">u</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">··—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">v</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">···—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">w</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·——</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">x</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—··—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">y</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—·——</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold lowercase">z</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">——··</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">0</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—————</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">1</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·————</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">2</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">··———</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">3</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">···——</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">4</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">····—</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">5</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">·····</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">6</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">—····</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">7</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">——···</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">8</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">———··</span>
+          </div>
+          <div class="flex items-center justify-start gap-2">
+            <span class="text-white font-bold font-mono">9</span
+            ><span class="text-[#ffbe44] font-bold tracking-widest">————·</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
     <!-- Settings overlay panel -->
     <aside
       id="settings-panel"
