@@ -40,7 +40,7 @@ No build step or package installation needed. You'll just need Python to run a l
 Clone the repo:
 
 ```bash
-git clone https://github.com/your-username/tx.git
+git clone https://github.com/pxrxp/TX.git
 cd tx
 ```
 
