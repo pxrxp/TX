@@ -64,7 +64,249 @@
       "
     ></div>
 
-    <!-- Station Entry Landing Screen -->
+    <!-- Settings Overlay Menu -->
+    <aside
+      id="settings-panel"
+      aria-label="Settings"
+      class="fixed top-5 left-0 right-0 mx-auto z-50 w-[calc(100%-2rem)] max-w-sm transition-all duration-300 hidden"
+    >
+      <div
+        class="relative w-full rounded-2xl px-6 py-5 text-[#f0f2f5] flex flex-col gap-4 select-none"
+        style="
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(20, 24, 33, 0.45) 100%
+          );
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow:
+            rgba(255, 255, 255, 0.2) 0px 1px 1px 0px inset,
+            rgba(0, 0, 0, 0.5) 0px 12px 32px -4px;
+        "
+      >
+        <div
+          class="flex items-center justify-between w-full border-b border-white/[0.08] pb-2.5"
+        >
+          <span
+            class="font-['Outfit'] font-bold text-lg tracking-tight text-white lowercase"
+            >settings</span
+          >
+          <button
+            id="close-settings-btn"
+            aria-label="close settings"
+            class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition cursor-pointer"
+            type="button"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" x2="6" y1="6" y2="18"></line>
+              <line x1="6" x2="18" y1="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div
+          class="flex flex-col gap-3.5 font-['Outfit'] text-[13px] sm:text-sm pt-0.5"
+        >
+          <!-- Your Tone -->
+          <div
+            class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
+          >
+            <div class="flex items-center justify-between">
+              <label
+                for="freq-slider"
+                class="text-zinc-200 font-semibold lowercase"
+                >your tone</label
+              >
+              <span
+                id="freq-val"
+                class="font-mono text-[#ffbe44] font-bold text-[13px] sm:text-sm lowercase"
+                >650 hz</span
+              >
+            </div>
+            <input
+              id="freq-slider"
+              type="range"
+              min="400"
+              max="900"
+              step="25"
+              value="650"
+              class="w-full accent-[#ffbe44] cursor-pointer bg-zinc-800 rounded-lg h-1.5"
+            />
+          </div>
+
+          <!-- Peer Tone -->
+          <div
+            class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
+          >
+            <div class="flex items-center justify-between">
+              <label
+                for="peer-freq-slider"
+                class="text-zinc-200 font-semibold lowercase"
+                >peer tone</label
+              >
+              <span
+                id="peer-freq-val"
+                class="font-mono text-[#ffbe44] font-bold text-[13px] sm:text-sm lowercase"
+                >550 hz</span
+              >
+            </div>
+            <input
+              id="peer-freq-slider"
+              type="range"
+              min="350"
+              max="850"
+              step="25"
+              value="550"
+              class="w-full accent-[#ffbe44] cursor-pointer bg-zinc-800 rounded-lg h-1.5"
+            />
+          </div>
+
+          <!-- Your Speed -->
+          <div
+            class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
+          >
+            <div class="flex items-center justify-between">
+              <label
+                for="wpm-slider"
+                class="text-zinc-200 font-semibold lowercase"
+                >your speed</label
+              >
+              <span
+                id="wpm-val"
+                class="font-mono text-[#ffbe44] font-bold text-[13px] sm:text-sm lowercase"
+                >18 wpm</span
+              >
+            </div>
+            <input
+              id="wpm-slider"
+              type="range"
+              min="8"
+              max="35"
+              step="1"
+              value="18"
+              class="w-full accent-[#ffbe44] cursor-pointer bg-zinc-800 rounded-lg h-1.5"
+            />
+          </div>
+
+          <!-- Peer Speed -->
+          <div
+            class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
+          >
+            <div class="flex items-center justify-between">
+              <label
+                for="peer-wpm-slider"
+                class="text-zinc-200 font-semibold lowercase"
+                >peer speed</label
+              >
+              <span
+                id="peer-wpm-val"
+                class="font-mono text-[#ffbe44] font-bold text-[13px] sm:text-sm lowercase"
+                >18 wpm</span
+              >
+            </div>
+            <input
+              id="peer-wpm-slider"
+              type="range"
+              min="8"
+              max="35"
+              step="1"
+              value="18"
+              class="w-full accent-[#ffbe44] cursor-pointer bg-zinc-800 rounded-lg h-1.5"
+            />
+          </div>
+
+          <!-- Auto-Send Delay (Default 2.0s) -->
+          <div
+            class="flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.06]"
+          >
+            <div class="flex items-center justify-between">
+              <label
+                for="transmit-delay-slider"
+                class="text-zinc-200 font-semibold lowercase"
+                >auto-send</label
+              >
+              <span
+                id="transmit-delay-val"
+                class="font-mono text-[#ffbe44] font-bold text-[13px] sm:text-sm lowercase"
+                >2.0s</span
+              >
+            </div>
+            <input
+              id="transmit-delay-slider"
+              type="range"
+              min="1.0"
+              max="5.5"
+              step="0.5"
+              value="2.0"
+              class="w-full accent-[#ffbe44] cursor-pointer bg-zinc-800 rounded-lg h-1.5"
+            />
+          </div>
+
+          <!-- Translation Toggle -->
+          <div
+            class="flex items-center justify-between pb-2.5 border-b border-white/[0.06]"
+          >
+            <span class="text-zinc-200 font-semibold lowercase"
+              >translation</span
+            >
+            <div
+              class="flex items-center gap-1.5 font-mono text-xs sm:text-[13px]"
+            >
+              <button
+                id="trans-on-btn"
+                type="button"
+                class="text-[#ffbe44] font-bold transition cursor-pointer lowercase"
+              >
+                on
+              </button>
+              <span class="text-zinc-600">/</span>
+              <button
+                id="trans-off-btn"
+                type="button"
+                class="text-zinc-400 hover:text-white transition cursor-pointer lowercase"
+              >
+                off
+              </button>
+            </div>
+          </div>
+
+          <!-- Time Mode -->
+          <div class="flex items-center justify-between pt-0.5">
+            <span class="text-zinc-200 font-semibold lowercase">time</span>
+            <div
+              class="flex items-center gap-1.5 font-mono text-xs sm:text-[13px]"
+            >
+              <button
+                id="clock-utc-btn"
+                type="button"
+                class="text-[#ffbe44] font-bold transition cursor-pointer lowercase"
+              >
+                utc
+              </button>
+              <span class="text-zinc-600">/</span>
+              <button
+                id="clock-local-btn"
+                type="button"
+                class="text-zinc-400 hover:text-white transition cursor-pointer lowercase"
+              >
+                local
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!--  Landing Screen -->
     <main
       id="station-landing-view"
       class="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4"
