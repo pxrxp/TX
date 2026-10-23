@@ -10,12 +10,8 @@ const connectBtn = document.getElementById('connect-btn');
 const landingError = document.getElementById('landing-error');
 
 const activeView = document.getElementById('wire-active-view');
-const topMorsePanel = document.getElementById('top-morse-panel');
 const settingsPanel = document.getElementById('settings-panel');
-const closeCipherBtn = document.getElementById('close-cipher-btn');
 const closeSettingsBtn = document.getElementById('close-settings-btn');
-const toggleCheat = document.getElementById('toggle-cheat');
-const toggleSfx = document.getElementById('toggle-sfx');
 const toggleSettings = document.getElementById('toggle-settings');
 const chatStream = document.getElementById('chat-stream');
 const morseBuffer = document.getElementById('morse-buffer');
@@ -23,6 +19,8 @@ const decodedLiveRow = document.getElementById('decoded-live-row');
 const decodedLive = document.getElementById('decoded-live');
 const clearBtn = document.getElementById('clear-btn');
 const sendBtn = document.getElementById('send-btn');
+const sendTimerTrack = document.getElementById('send-timer-track');
+const sendTimerRing = document.getElementById('send-timer-ring');
 const telegraphKeyBed = document.getElementById('telegraph-key-bed');
 
 const freqSlider = document.getElementById('freq-slider');
@@ -33,6 +31,8 @@ const wpmSlider = document.getElementById('wpm-slider');
 const wpmVal = document.getElementById('wpm-val');
 const peerWpmSlider = document.getElementById('peer-wpm-slider');
 const peerWpmVal = document.getElementById('peer-wpm-val');
+const transmitDelaySlider = document.getElementById('transmit-delay-slider');
+const transmitDelayVal = document.getElementById('transmit-delay-val');
 
 const ROOMS = ['wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop', 'main-hub'];
 const PREFIXES = ['stn', 'spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal'];
@@ -83,6 +83,35 @@ const decoder = new MorseDecoder(
   () => transmitMessage()
 );
 
+let timerAnim = null;
+let timerStart = 0;
+const CIRCUMFERENCE = 125.66;
+
+function startTimerRing() {
+  resetTimerRing();
+  if (decoder.autoSendDelay <= 0) return;
+
+  if (sendTimerTrack) sendTimerTrack.classList.remove('opacity-0');
+  timerStart = performance.now();
+
+  function step(now) {
+    const elapsed = now - timerStart;
+    const progress = Math.min(elapsed / decoder.autoSendDelay, 1.0);
+    sendTimerRing.style.strokeDashoffset = CIRCUMFERENCE * (1.0 - progress);
+
+    if (progress < 1.0) {
+      timerAnim = requestAnimationFrame(step);
+    }
+  }
+  timerAnim = requestAnimationFrame(step);
+}
+
+function resetTimerRing() {
+  if (timerAnim) cancelAnimationFrame(timerAnim);
+  if (sendTimerTrack) sendTimerTrack.classList.add('opacity-0');
+  sendTimerRing.style.strokeDashoffset = CIRCUMFERENCE;
+}
+
 function formatMessageTime() {
   const d = new Date();
   if (timeFormat === 'LOCAL') {
@@ -112,6 +141,7 @@ function appendMessage(sender, rawMorse, decoded) {
 }
 
 function transmitMessage() {
+  resetTimerRing();
   const { rawMorse, decoded } = decoder.flushAndGet();
   if (!decoded.trim()) return;
 
@@ -128,6 +158,7 @@ function handleDown(e) {
   if (e.type === 'keydown') e.preventDefault();
   if (isKeyDown) return;
 
+  resetTimerRing();
   isKeyDown = true;
   audio.startTone();
   document.body.classList.add('key-pressed');
@@ -145,6 +176,10 @@ function handleUp(e) {
   document.body.classList.remove('key-pressed');
   decoder.keyUp();
   network.sendSignal('UP', myCallsign);
+
+  if (decoder.hasContent()) {
+    startTimerRing();
+  }
 }
 
 connectBtn.addEventListener('click', async () => {
@@ -180,6 +215,7 @@ telegraphKeyBed.addEventListener('pointerdown', (e) => { e.preventDefault(); han
 window.addEventListener('pointerup', () => { if (isKeyDown) handleUp({ type: 'keyup', code: 'Space' }); });
 
 clearBtn.addEventListener('click', () => {
+  resetTimerRing();
   decoder.clear();
 });
 
@@ -213,4 +249,15 @@ peerWpmSlider.addEventListener('input', (e) => {
   const val = e.target.value;
   peerWpmVal.innerText = `${val} wpm`;
   peerWpm = parseInt(val, 10);
+});
+
+transmitDelaySlider.addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  if (val >= 5.5) {
+    transmitDelayVal.innerText = 'manual';
+    decoder.setAutoSendDelay(0);
+  } else {
+    transmitDelayVal.innerText = `${val.toFixed(1)}s`;
+    decoder.setAutoSendDelay(val * 1000);
+  }
 });
