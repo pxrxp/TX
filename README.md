@@ -4,8 +4,8 @@ A virtual telegraph for talking to people in Morse code.
 
 Join a channel, tap out a message, and see what comes back. You can watch the text as you go, or turn it off and try to copy everything by ear. It's also a handy way to get more comfortable with sending and reading Morse.
 
-<img width="1781" height="1048" alt="image" src="https://github.com/user-attachments/assets/0d50d9e0-315e-44aa-9cfe-e91d52724cd6" />
-<img width="1781" height="1048" alt="image" src="https://github.com/user-attachments/assets/ca66708f-96f7-4a6d-a1f7-92b61748acbc" />
+<img width="1781" height="1048" alt="image" src="https://github.com/user-attachments/assets/e6f6540e-7246-4b7a-b39f-dc9b20c62496" />
+<img width="1781" height="1048" alt="image" src="https://github.com/user-attachments/assets/89d095c6-46da-4e71-9b51-b5e2a482fc4c" />
 
 ## Disclaimer
 
