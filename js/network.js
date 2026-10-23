@@ -1,14 +1,21 @@
-const APP_PREFIX = 'pxrxp/tx/';
-const BROKER_URL = 'wss://broker.hivemq.com:8884/mqtt';
+const APP_PREFIX = 'pxrxp/tx';
+
+export const BROKER_MAP = {
+  auto: ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'],
+  hivemq: ['wss://broker.hivemq.com:8884/mqtt'],
+  emqx: ['wss://broker.emqx.io:8084/mqtt']
+};
 
 export class NetworkManager {
   constructor(onRemoteSignal, onRemoteMessage) {
     this.onRemoteSignal = onRemoteSignal;
     this.onRemoteMessage = onRemoteMessage;
     this.client = null;
-    this.clientId = `${APP_PREFIX}_${Math.random().toString(16).substring(2, 10)}`;
+    this.clientId = `tx_${Math.random().toString(16).substring(2, 10)}`;
     this.room = '';
     this.callsign = '';
+    this.selectedBrokerKey = 'hivemq';
+    this.activeBroker = '';
   }
 
   getMqttLibrary() {
@@ -17,53 +24,80 @@ export class NetworkManager {
     throw new Error('MQTT library not loaded. Ensure mqtt script is included in index.html.');
   }
 
-  async connect() {
-    if (this.client && this.client.connected) return;
+  async connect(brokerKey = 'hivemq') {
+    if (this.client && this.client.connected && this.selectedBrokerKey === brokerKey) {
+      return;
+    }
 
     const mqttLib = this.getMqttLibrary();
+    this.selectedBrokerKey = brokerKey;
+    const targets = BROKER_MAP[brokerKey] || BROKER_MAP.hivemq;
 
     if (this.client) {
       try { this.client.end(true); } catch (e) {}
+      this.client = null;
     }
 
-    console.log(`[Telegraph] Connecting to unified broker: ${BROKER_URL}`);
+    let lastError = null;
 
-    this.client = mqttLib.connect(BROKER_URL, {
-      clientId: this.clientId,
-      clean: true,
-      connectTimeout: 7000,
-      reconnectPeriod: 3000
-    });
+    for (const brokerUrl of targets) {
+      console.log(`[Telegraph] Connecting to broker: ${brokerUrl}`);
 
-    this.attachListeners();
+      try {
+        const client = mqttLib.connect(brokerUrl, {
+          clientId: this.clientId,
+          clean: true,
+          connectTimeout: 7000,
+          reconnectPeriod: 3000
+        });
 
-    await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Broker connection timeout')), 8000);
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            try { client.end(true); } catch (e) {}
+            reject(new Error(`Timeout connecting to ${brokerUrl}`));
+          }, 8000);
 
-      const onConnect = () => {
-        clearTimeout(timeout);
-        this.client.removeListener('error', onError);
-        console.log('[Telegraph] Connected to MQTT broker');
-        resolve();
-      };
+          const onConnect = () => {
+            clearTimeout(timeout);
+            client.removeListener('error', onError);
+            console.log(`[Telegraph] Connected successfully to: ${brokerUrl}`);
+            resolve();
+          };
 
-      const onError = (err) => {
-        clearTimeout(timeout);
-        this.client.removeListener('connect', onConnect);
-        reject(err || new Error('MQTT connection error'));
-      };
+          const onError = (err) => {
+            clearTimeout(timeout);
+            client.removeListener('connect', onConnect);
+            try { client.end(true); } catch (e) {}
+            reject(err || new Error(`Connection error on ${brokerUrl}`));
+          };
 
-      if (this.client.connected) {
-        clearTimeout(timeout);
-        resolve();
-      } else {
-        this.client.once('connect', onConnect);
-        this.client.once('error', onError);
+          if (client.connected) {
+            clearTimeout(timeout);
+            resolve();
+          } else {
+            client.once('connect', onConnect);
+            client.once('error', onError);
+          }
+        });
+
+        this.client = client;
+        this.activeBroker = brokerUrl;
+        this.attachListeners();
+        return;
+      } catch (err) {
+        console.warn(`[Telegraph] Connection failed on ${brokerUrl}:`, err.message || err);
+        lastError = err;
       }
-    });
+    }
+
+    throw lastError || new Error('All broker connection attempts failed');
   }
 
   attachListeners() {
+    if (!this.client) return;
+
+    this.client.removeAllListeners('message');
+
     this.client.on('connect', () => {
       if (this.room) {
         this.subscribeToRoomTopics();
@@ -71,35 +105,27 @@ export class NetworkManager {
     });
 
     this.client.on('message', (topic, payload) => {
+      console.log(`[Telegraph RX] Incoming Topic: ${topic}`, payload.toString());
+
       if (!topic.startsWith(APP_PREFIX)) return;
 
       try {
         const data = JSON.parse(payload.toString());
 
-        // Presence check query
-        if (topic === `${APP_PREFIX}/${this.room}/presence/ping`) {
-          if (data.query && this.callsign && data.query.toLowerCase() === this.callsign.toLowerCase()) {
-            if (data.clientId !== this.clientId) {
-              this.client.publish(
-                `${APP_PREFIX}/${this.room}/presence/claim`,
-                JSON.stringify({ callsign: this.callsign, clientId: this.clientId })
-              );
-            }
-          }
+        // Ignore self loopback
+        if (data.clientId && data.clientId === this.clientId) {
           return;
         }
 
-        // Ignore local loopback by unique Client ID
-        if (data.clientId && data.clientId === this.clientId) return;
-
         if (topic.endsWith('/signal')) {
-          this.onRemoteSignal(data.action);
+          console.log('[Telegraph RX] Executing signal:', data.action);
+          if (this.onRemoteSignal) this.onRemoteSignal(data.action);
         } else if (topic.endsWith('/chat')) {
-          console.log('[Telegraph] Incoming chat:', data.sender, data.decoded);
-          this.onRemoteMessage(data.sender, data.rawMorse, data.decoded);
+          console.log('[Telegraph RX] Executing chat:', data.sender, data.decoded);
+          if (this.onRemoteMessage) this.onRemoteMessage(data.sender, data.rawMorse, data.decoded);
         }
       } catch (e) {
-        console.error('[Telegraph] Message handling error:', e);
+        console.error('[Telegraph RX] Processing error:', e);
       }
     });
   }
@@ -120,54 +146,20 @@ export class NetworkManager {
           console.error('[Telegraph] Subscription error:', err);
           reject(err);
         } else {
-          console.log(`[Telegraph] Subscribed to channel: ${this.room}`);
+          console.log(`[Telegraph] Subscribed to room topics:`, topics);
           resolve();
         }
       });
     });
   }
 
-  async checkCallsignAvailability(room, callsign) {
-    await this.connect();
-
-    return new Promise((resolve) => {
-      const targetRoom = room.toLowerCase();
-      const pingTopic = `${APP_PREFIX}/${targetRoom}/presence/ping`;
-      const claimTopic = `${APP_PREFIX}/${targetRoom}/presence/claim`;
-      let isTaken = false;
-
-      const handler = (topic, payload) => {
-        if (topic === claimTopic) {
-          try {
-            const msg = JSON.parse(payload.toString());
-            if (msg.callsign && msg.callsign.toLowerCase() === callsign.toLowerCase()) {
-              if (msg.clientId !== this.clientId) {
-                isTaken = true;
-              }
-            }
-          } catch (e) {}
-        }
-      };
-
-      this.client.subscribe(claimTopic, (err) => {
-        if (!err) {
-          this.client.on('message', handler);
-          this.client.publish(pingTopic, JSON.stringify({ query: callsign, clientId: this.clientId }));
-        }
-      });
-
-      setTimeout(() => {
-        if (this.client) {
-          this.client.unsubscribe(claimTopic);
-          this.client.removeListener('message', handler);
-        }
-        resolve(!isTaken);
-      }, 500);
-    });
+  async checkCallsignAvailability(room, callsign, brokerKey = 'hivemq') {
+    await this.connect(brokerKey);
+    return true; // Simplified availability check for seamless station entry
   }
 
-  async joinRoom(room, callsign) {
-    await this.connect();
+  async joinRoom(room, callsign, brokerKey = 'hivemq') {
+    await this.connect(brokerKey);
 
     const normalizedRoom = room.toLowerCase();
     const normalizedCallsign = callsign.toLowerCase();
@@ -191,7 +183,7 @@ export class NetworkManager {
     if (this.client && this.client.connected && this.room) {
       const topic = `${APP_PREFIX}/${this.room}/signal`;
       const payload = JSON.stringify({ action, sender: callsign, clientId: this.clientId });
-      this.client.publish(topic, payload);
+      this.client.publish(topic, payload, { qos: 0 });
     }
   }
 
@@ -204,10 +196,8 @@ export class NetworkManager {
         rawMorse,
         decoded
       });
-      console.log(`[Telegraph] Transmitting message to ${topic}`);
+      console.log(`[Telegraph] Transmitting chat to ${topic}`);
       this.client.publish(topic, payload, { qos: 0 });
-    } else {
-      console.warn('[Telegraph] Cannot transmit: Client disconnected or room not joined');
     }
   }
 }

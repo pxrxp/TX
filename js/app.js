@@ -10,6 +10,7 @@ const randomizeBtn = document.getElementById('randomize-btn');
 const connectBtn = document.getElementById('connect-btn');
 const landingError = document.getElementById('landing-error');
 const toggleCipherBtn = document.getElementById('toggle-cipher-btn');
+const brokerSelect = document.getElementById('broker-select');
 
 // Active Deck DOM
 const activeView = document.getElementById('wire-active-view');
@@ -82,10 +83,25 @@ let peerStopTimer = null;
 const MIN_TONE_DURATION_MS = 35; // Guarantees dots are audible even with network jitter
 const MAX_TONE_DURATION_MS = 3000; // Safety cutoff if UP packet drops
 
-// Network Initialization
+// Helper to unlock Web Audio API policy for BOTH local & peer audio contexts
+function unlockAudioContexts() {
+  if (audio && audio.ctx && audio.ctx.state === 'suspended') {
+    audio.ctx.resume();
+  }
+  if (peerAudio && peerAudio.ctx && peerAudio.ctx.state === 'suspended') {
+    peerAudio.ctx.resume();
+  }
+}
+
+// Network Initialization with robust signal handling & case-normalization
 const network = new NetworkManager(
   (action) => {
-    if (action === 'DOWN') {
+    if (!action) return;
+    const normalizedAction = action.toUpperCase();
+
+    unlockAudioContexts();
+
+    if (normalizedAction === 'DOWN') {
       clearTimeout(peerStopTimer);
       peerDownTime = performance.now();
       peerAudio.startTone();
@@ -95,7 +111,8 @@ const network = new NetworkManager(
         peerAudio.stopTone();
         document.body.classList.remove('key-pressed');
       }, MAX_TONE_DURATION_MS);
-    } else if (action === 'UP') {
+
+    } else if (normalizedAction === 'UP') {
       clearTimeout(peerStopTimer);
       const elapsed = performance.now() - peerDownTime;
       const remaining = Math.max(0, MIN_TONE_DURATION_MS - elapsed);
@@ -210,6 +227,7 @@ function handleDown(e) {
   if (e.type === 'keydown') e.preventDefault();
   if (isKeyDown) return;
 
+  unlockAudioContexts();
   resetTimerRing();
   isKeyDown = true;
   audio.startTone();
@@ -234,22 +252,24 @@ function handleUp(e) {
   }
 }
 
-// Station Connect & Validation
-connectBtn.addEventListener('click', async () => {
+// Landing DOM Connection Handler
+connectBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+
   const chosenCallsign = callsignInput.value.trim().toLowerCase() || generateRandomCallsign();
   const targetChannel = roomInput.value.trim().toLowerCase() || 'default';
+  const chosenBroker = brokerSelect ? brokerSelect.value : 'auto';
 
   landingError.classList.add('hidden');
   landingError.innerText = '';
   connectBtn.disabled = true;
 
   try {
-    audio.init();
-    peerAudio.init();
+    unlockAudioContexts();
 
-    await network.connect();
+    await network.connect(chosenBroker);
 
-    const available = await network.checkCallsignAvailability(targetChannel, chosenCallsign);
+    const available = await network.checkCallsignAvailability(targetChannel, chosenCallsign, chosenBroker);
 
     if (!available) {
       landingError.innerText = `callsign "${chosenCallsign}" is taken in ${targetChannel}. try randomizing!`;
@@ -258,13 +278,14 @@ connectBtn.addEventListener('click', async () => {
       return;
     }
 
-    await network.joinRoom(targetChannel, chosenCallsign);
+    await network.joinRoom(targetChannel, chosenCallsign, chosenBroker);
     myCallsign = chosenCallsign;
 
     landingView.classList.add('hidden');
     activeView.classList.remove('hidden');
     activeView.classList.add('flex');
   } catch (err) {
+    console.error('[Telegraph Error]', err);
     landingError.innerText = 'failed to connect to telegraph broker. please try again.';
     landingError.classList.remove('hidden');
   } finally {
@@ -332,7 +353,7 @@ wpmSlider.addEventListener('input', (e) => {
 
 peerWpmSlider.addEventListener('input', (e) => {
   const val = e.target.value;
-  peerWpmVal.innerText = `${val} wpm`;
+  peerFreqVal.innerText = `${val} wpm`;
   peerWpm = parseInt(val, 10);
 });
 
