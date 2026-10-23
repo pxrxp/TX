@@ -48,7 +48,7 @@ const clockUtcBtn = document.getElementById('clock-utc-btn');
 const clockLocalBtn = document.getElementById('clock-local-btn');
 
 // Channel Hubs & Callsigns
-const ROOMS = ['wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop', 'main-hub'];
+const ROOMS = ['default', 'wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop'];
 const PREFIXES = ['stn', 'spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal'];
 
 function randomCallsign() {
@@ -57,8 +57,8 @@ function randomCallsign() {
   return `${prefix}-${num}`;
 }
 
-callsignInput.value = randomCallsign();
-roomInput.value = ROOMS[0];
+callsignInput.value = 'default-user';
+roomInput.value = 'default';
 
 randomizeBtn.addEventListener('click', () => {
   const current = roomInput.value;
@@ -75,15 +75,35 @@ let timeFormat = 'UTC';
 let showTranslation = true;
 let peerWpm = 18;
 
+let peerDownTime = 0;
+let peerStopTimer = null;
+const MIN_TONE_DURATION_MS = 35; // Guarantees dots are audible even with network jitter
+const MAX_TONE_DURATION_MS = 3000; // Safety cutoff if UP packet drops
+
 // Network Initialization
 const network = new NetworkManager(
   (action) => {
     if (action === 'DOWN') {
+      clearTimeout(peerStopTimer);
+      peerDownTime = performance.now();
       peerAudio.startTone();
       document.body.classList.add('key-pressed');
+
+      // Safety timeout if UP packet drops over network
+      peerStopTimer = setTimeout(() => {
+        peerAudio.stopTone();
+        document.body.classList.remove('key-pressed');
+      }, MAX_TONE_DURATION_MS);
+
     } else if (action === 'UP') {
-      peerAudio.stopTone();
-      document.body.classList.remove('key-pressed');
+      clearTimeout(peerStopTimer);
+      const elapsed = performance.now() - peerDownTime;
+      const remaining = Math.max(0, MIN_TONE_DURATION_MS - elapsed);
+
+      peerStopTimer = setTimeout(() => {
+        peerAudio.stopTone();
+        document.body.classList.remove('key-pressed');
+      }, remaining);
     }
   },
   (senderCallsign, rawMorse, decoded) => {
@@ -212,8 +232,8 @@ function handleUp(e) {
 
 // Station Connect & Validation
 connectBtn.addEventListener('click', async () => {
-  const chosenCallsign = callsignInput.value.trim().toLowerCase() || 'stn-74';
-  const targetChannel = roomInput.value.trim().toLowerCase() || 'wire-01';
+  const chosenCallsign = callsignInput.value.trim().toLowerCase() || 'default-user';
+  const targetChannel = roomInput.value.trim().toLowerCase() || 'default';
 
   landingError.classList.add('hidden');
   landingError.innerText = '';
