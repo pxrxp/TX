@@ -10,6 +10,13 @@ const connectBtn = document.getElementById('connect-btn');
 const landingError = document.getElementById('landing-error');
 
 const activeView = document.getElementById('wire-active-view');
+const topMorsePanel = document.getElementById('top-morse-panel');
+const settingsPanel = document.getElementById('settings-panel');
+const closeCipherBtn = document.getElementById('close-cipher-btn');
+const closeSettingsBtn = document.getElementById('close-settings-btn');
+const toggleCheat = document.getElementById('toggle-cheat');
+const toggleSfx = document.getElementById('toggle-sfx');
+const toggleSettings = document.getElementById('toggle-settings');
 const chatStream = document.getElementById('chat-stream');
 const morseBuffer = document.getElementById('morse-buffer');
 const decodedLiveRow = document.getElementById('decoded-live-row');
@@ -17,6 +24,11 @@ const decodedLive = document.getElementById('decoded-live');
 const clearBtn = document.getElementById('clear-btn');
 const sendBtn = document.getElementById('send-btn');
 const telegraphKeyBed = document.getElementById('telegraph-key-bed');
+
+const freqSlider = document.getElementById('freq-slider');
+const freqVal = document.getElementById('freq-val');
+const peerFreqSlider = document.getElementById('peer-freq-slider');
+const peerFreqVal = document.getElementById('peer-freq-val');
 
 const ROOMS = ['wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop', 'main-hub'];
 const PREFIXES = ['stn', 'spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal'];
@@ -167,3 +179,21 @@ clearBtn.addEventListener('click', () => {
 });
 
 sendBtn.addEventListener('click', () => transmitMessage());
+
+toggleSettings.addEventListener('click', () => {
+  settingsPanel.classList.toggle('hidden');
+});
+
+closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.add('hidden'));
+
+freqSlider.addEventListener('input', (e) => {
+  const val = e.target.value;
+  freqVal.innerText = `${val} hz`;
+  audio.setFrequency(parseInt(val, 10));
+});
+
+peerFreqSlider.addEventListener('input', (e) => {
+  const val = e.target.value;
+  peerFreqVal.innerText = `${val} hz`;
+  peerAudio.setFrequency(parseInt(val, 10));
+});
