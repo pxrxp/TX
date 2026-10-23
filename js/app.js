@@ -49,20 +49,22 @@ const clockLocalBtn = document.getElementById('clock-local-btn');
 
 // Channel Hubs & Callsigns
 const ROOMS = ['default', 'wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop'];
-const PREFIXES = ['stn', 'spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal'];
+const PREFIXES = ['spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal', 'pulse', 'tower', 'node'];
 
-function randomCallsign() {
+function generateRandomCallsign() {
   const prefix = PREFIXES[Math.floor(Math.random() * PREFIXES.length)];
-  const num = Math.floor(10 + Math.random() * 90);
+  const num = Math.floor(100 + Math.random() * 900);
   return `${prefix}-${num}`;
 }
 
-callsignInput.value = 'default-user';
+// Auto-assign unique random callsign per tab session on load
+callsignInput.value = generateRandomCallsign();
 roomInput.value = 'default';
 
 randomizeBtn.addEventListener('click', () => {
-  const current = roomInput.value;
-  const choices = ROOMS.filter(r => r !== current);
+  callsignInput.value = generateRandomCallsign();
+  const currentRoom = roomInput.value;
+  const choices = ROOMS.filter((r) => r !== currentRoom);
   roomInput.value = choices[Math.floor(Math.random() * choices.length)];
 });
 
@@ -89,12 +91,10 @@ const network = new NetworkManager(
       peerAudio.startTone();
       document.body.classList.add('key-pressed');
 
-      // Safety timeout if UP packet drops over network
       peerStopTimer = setTimeout(() => {
         peerAudio.stopTone();
         document.body.classList.remove('key-pressed');
       }, MAX_TONE_DURATION_MS);
-
     } else if (action === 'UP') {
       clearTimeout(peerStopTimer);
       const elapsed = performance.now() - peerDownTime;
@@ -135,7 +135,9 @@ function startTimerRing() {
   function step(now) {
     const elapsed = now - timerStart;
     const progress = Math.min(elapsed / decoder.autoSendDelay, 1.0);
-    sendTimerRing.style.strokeDashoffset = CIRCUMFERENCE * (1.0 - progress);
+    if (sendTimerRing) {
+      sendTimerRing.style.strokeDashoffset = CIRCUMFERENCE * (1.0 - progress);
+    }
 
     if (progress < 1.0) {
       timerAnim = requestAnimationFrame(step);
@@ -147,7 +149,7 @@ function startTimerRing() {
 function resetTimerRing() {
   if (timerAnim) cancelAnimationFrame(timerAnim);
   if (sendTimerTrack) sendTimerTrack.classList.add('opacity-0');
-  sendTimerRing.style.strokeDashoffset = CIRCUMFERENCE;
+  if (sendTimerRing) sendTimerRing.style.strokeDashoffset = CIRCUMFERENCE;
 }
 
 function formatMessageTime() {
@@ -162,17 +164,17 @@ function updateTranslationVisibility() {
   if (decodedLiveRow) {
     decodedLiveRow.style.display = showTranslation ? 'flex' : 'none';
   }
-  document.querySelectorAll('.decoded-text-line').forEach(el => {
+  document.querySelectorAll('.decoded-text-line').forEach((el) => {
     el.style.display = showTranslation ? 'block' : 'none';
   });
 }
 
 function appendMessage(sender, rawMorse, decoded) {
   const timeStr = formatMessageTime();
-  const isSelf = sender === myCallsign || sender === 'you';
+  const isSelf = sender.toLowerCase() === myCallsign.toLowerCase() || sender === 'you';
 
   const msgDiv = document.createElement('div');
-  msgDiv.className = `teleprinter-line flex flex-col ${isSelf ? 'items-end ml-auto text-right' : 'items-start'} gap-1`;
+  msgDiv.className = `teleprinter-line flex flex-col ${isSelf ? 'items-end ml-auto text-right' : 'items-start'} gap-1 w-full my-2`;
   msgDiv.innerHTML = `
     <div class="flex items-center gap-2 text-[11px] font-mono tracking-wider text-[#636a77]">
       <span class="${isSelf ? 'text-[#ffbe44]' : 'text-[#f0f2f5]'} font-sans font-black text-xs tracking-wider">${sender}</span>
@@ -184,7 +186,9 @@ function appendMessage(sender, rawMorse, decoded) {
   `;
 
   chatStream.appendChild(msgDiv);
-  chatStream.scrollTop = chatStream.scrollHeight;
+  requestAnimationFrame(() => {
+    chatStream.scrollTop = chatStream.scrollHeight;
+  });
 }
 
 function transmitMessage() {
@@ -232,7 +236,7 @@ function handleUp(e) {
 
 // Station Connect & Validation
 connectBtn.addEventListener('click', async () => {
-  const chosenCallsign = callsignInput.value.trim().toLowerCase() || 'default-user';
+  const chosenCallsign = callsignInput.value.trim().toLowerCase() || generateRandomCallsign();
   const targetChannel = roomInput.value.trim().toLowerCase() || 'default';
 
   landingError.classList.add('hidden');
@@ -248,7 +252,7 @@ connectBtn.addEventListener('click', async () => {
     const available = await network.checkCallsignAvailability(targetChannel, chosenCallsign);
 
     if (!available) {
-      landingError.innerText = `callsign "${chosenCallsign}" is already taken in ${targetChannel}`;
+      landingError.innerText = `callsign "${chosenCallsign}" is taken in ${targetChannel}. try randomizing!`;
       landingError.classList.remove('hidden');
       connectBtn.disabled = false;
       return;
@@ -272,8 +276,13 @@ connectBtn.addEventListener('click', async () => {
 window.addEventListener('keydown', handleDown);
 window.addEventListener('keyup', handleUp);
 
-telegraphKeyBed.addEventListener('pointerdown', (e) => { e.preventDefault(); handleDown(e); });
-window.addEventListener('pointerup', () => { if (isKeyDown) handleUp({ type: 'keyup', code: 'Space' }); });
+telegraphKeyBed.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  handleDown(e);
+});
+window.addEventListener('pointerup', () => {
+  if (isKeyDown) handleUp({ type: 'keyup', code: 'Space' });
+});
 
 clearBtn.addEventListener('click', () => {
   resetTimerRing();
