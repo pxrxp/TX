@@ -7,71 +7,106 @@ export class NetworkManager {
     this.client = null;
     this.room = '';
     this.callsign = '';
-    this.isListenersSet = false;
+  }
+
+  getMqttLibrary() {
+    if (typeof window !== 'undefined' && window.mqtt) {
+      return window.mqtt;
+    }
+    if (typeof mqtt !== 'undefined') {
+      return mqtt;
+    }
+    throw new Error('MQTT library not loaded from CDN. Check script tags in index.html.');
   }
 
   async connect() {
     if (this.client && this.client.connected) return;
 
-    if (!this.client) {
-      const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
-      const clientId = `${APP_PREFIX}_${Math.random().toString(16).substring(2, 10)}`;
-      const mqttLib = window.mqtt || mqtt;
+    const mqttLib = this.getMqttLibrary();
+    const clientId = `${APP_PREFIX}_${Math.random().toString(16).substring(2, 10)}`;
 
-      this.client = mqttLib.connect(brokerUrl, {
-        clientId: clientId,
-        clean: true,
-        connectTimeout: 5000,
-        reconnectPeriod: 2000
-      });
+    const brokers = [
+      'wss://broker.hivemq.com:8884/mqtt',
+      'wss://broker.emqx.io:8084/mqtt'
+    ];
 
-      this.setupListeners();
-    }
+    let lastError = null;
 
-    if (!this.client.connected) {
-      await new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          if (this.client && this.client.connected) resolve();
-          else reject(new Error('Broker connection timeout'));
-        }, 6000);
+    for (const brokerUrl of brokers) {
+      try {
+        console.log(`[Telegraph] Attempting connection to: ${brokerUrl}`);
 
-        const onConnect = () => {
-          clearTimeout(timer);
-          this.client.removeListener('connect', onConnect);
-          resolve();
-        };
-
-        if (this.client.connected) {
-          clearTimeout(timer);
-          resolve();
-        } else {
-          this.client.on('connect', onConnect);
+        if (this.client) {
+          try {
+            this.client.end(true);
+          } catch (e) {}
         }
-      });
+
+        const client = mqttLib.connect(brokerUrl, {
+          clientId: clientId,
+          clean: true,
+          connectTimeout: 5000,
+          reconnectPeriod: 3000
+        });
+
+        // Attach message & reconnect listeners directly to this client instance
+        this.attachClientListeners(client);
+
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('Connection timeout')), 5000);
+
+          const onConnect = () => {
+            clearTimeout(timeout);
+            client.removeListener('error', onError);
+            console.log(`[Telegraph] Connected successfully to ${brokerUrl}`);
+            resolve();
+          };
+
+          const onError = (err) => {
+            clearTimeout(timeout);
+            client.removeListener('connect', onConnect);
+            reject(err || new Error('Connection failed'));
+          };
+
+          if (client.connected) {
+            clearTimeout(timeout);
+            resolve();
+          } else {
+            client.once('connect', onConnect);
+            client.once('error', onError);
+          }
+        });
+
+        this.client = client;
+        return; // Connection successful
+      } catch (err) {
+        console.warn(`[Telegraph] Failed broker ${brokerUrl}:`, err.message);
+        lastError = err;
+      }
     }
+
+    throw lastError || new Error('Could not connect to any MQTT broker');
   }
 
-  setupListeners() {
-    if (this.isListenersSet) return;
-    this.isListenersSet = true;
-
-    this.client.on('connect', () => {
+  attachClientListeners(client) {
+    client.on('connect', () => {
+      console.log('[Telegraph] Connected / Reconnected to MQTT broker');
       if (this.room) {
         this.resubscribeRoom();
       }
     });
 
-    this.client.on('message', (topic, payload) => {
-      // Ignore messages from other applications on the public broker
+    client.on('message', (topic, payload) => {
+      console.log('[Telegraph] Received topic message:', topic, payload.toString());
       if (!topic.startsWith(APP_PREFIX)) return;
 
       try {
         const data = JSON.parse(payload.toString());
 
-        // Presence query response
+        // Handle callsign reservation ping
         if (topic === `${APP_PREFIX}/${this.room}/presence/ping`) {
           if (data.query && this.callsign && data.query.toLowerCase() === this.callsign.toLowerCase()) {
-            this.client.publish(
+            client.publish(
               `${APP_PREFIX}/${this.room}/presence/claim`,
               JSON.stringify({ callsign: this.callsign })
             );
@@ -79,33 +114,39 @@ export class NetworkManager {
           return;
         }
 
-        // Ignore local loopback
-        if (data.sender === this.callsign) return;
+        // Prevent loopback self messages
+        if (data.sender && data.sender.toLowerCase() === this.callsign.toLowerCase()) {
+          return;
+        }
 
         if (topic.endsWith('/signal')) {
           this.onRemoteSignal(data.action);
         } else if (topic.endsWith('/chat')) {
+          console.log('[Telegraph] Rendering remote message from:', data.sender);
           this.onRemoteMessage(data.sender, data.rawMorse, data.decoded);
         }
       } catch (e) {
-        console.error('MQTT message error:', e);
+        console.error('[Telegraph] Error processing incoming payload:', e);
       }
     });
   }
 
   resubscribeRoom() {
-    if (!this.client || !this.room) return;
-    this.client.subscribe(`${APP_PREFIX}/${this.room}/signal`);
-    this.client.subscribe(`${APP_PREFIX}/${this.room}/chat`);
-    this.client.subscribe(`${APP_PREFIX}/${this.room}/presence/ping`);
+    if (!this.client || !this.client.connected || !this.room) return;
+    const roomPath = `${APP_PREFIX}/${this.room}`;
+
+    this.client.subscribe(`${roomPath}/signal`);
+    this.client.subscribe(`${roomPath}/chat`);
+    this.client.subscribe(`${roomPath}/presence/ping`);
+    console.log(`[Telegraph] Subscribed to channel: ${this.room}`);
   }
 
   async checkCallsignAvailability(room, callsign) {
     await this.connect();
 
     return new Promise((resolve) => {
-      const pingTopic = `${APP_PREFIX}/${room}/presence/ping`;
-      const claimTopic = `${APP_PREFIX}/${room}/presence/claim`;
+      const pingTopic = `${APP_PREFIX}/${room.toLowerCase()}/presence/ping`;
+      const claimTopic = `${APP_PREFIX}/${room.toLowerCase()}/presence/claim`;
       let isTaken = false;
 
       const handler = (topic, payload) => {
@@ -119,30 +160,38 @@ export class NetworkManager {
         }
       };
 
-      this.client.subscribe(claimTopic, () => {
-        this.client.on('message', handler);
-        this.client.publish(pingTopic, JSON.stringify({ query: callsign }));
+      this.client.subscribe(claimTopic, (err) => {
+        if (!err) {
+          this.client.on('message', handler);
+          this.client.publish(pingTopic, JSON.stringify({ query: callsign }));
+        }
       });
 
       setTimeout(() => {
-        this.client.unsubscribe(claimTopic);
-        this.client.removeListener('message', handler);
+        if (this.client) {
+          this.client.unsubscribe(claimTopic);
+          this.client.removeListener('message', handler);
+        }
         resolve(!isTaken);
-      }, 500);
+      }, 600);
     });
   }
 
   async joinRoom(room, callsign) {
     await this.connect();
 
-    if (this.room && this.room !== room) {
-      this.client.unsubscribe(`${APP_PREFIX}/${this.room}/signal`);
-      this.client.unsubscribe(`${APP_PREFIX}/${this.room}/chat`);
-      this.client.unsubscribe(`${APP_PREFIX}/${this.room}/presence/ping`);
+    const normalizedRoom = room.toLowerCase();
+    const normalizedCallsign = callsign.toLowerCase();
+
+    if (this.room && this.room !== normalizedRoom && this.client) {
+      const oldPath = `${APP_PREFIX}/${this.room}`;
+      this.client.unsubscribe(`${oldPath}/signal`);
+      this.client.unsubscribe(`${oldPath}/chat`);
+      this.client.unsubscribe(`${oldPath}/presence/ping`);
     }
 
-    this.room = room;
-    this.callsign = callsign;
+    this.room = normalizedRoom;
+    this.callsign = normalizedCallsign;
 
     this.resubscribeRoom();
   }
@@ -159,7 +208,12 @@ export class NetworkManager {
     if (this.client && this.client.connected) {
       const topic = `${APP_PREFIX}/${this.room}/chat`;
       const payload = JSON.stringify({ sender: callsign, rawMorse, decoded });
-      this.client.publish(topic, payload);
+      console.log(`[Telegraph] Publishing message to ${topic}:`, payload);
+      this.client.publish(topic, payload, { qos: 0 }, (err) => {
+        if (err) console.error('[Telegraph] Publish error:', err);
+      });
+    } else {
+      console.warn('[Telegraph] Cannot send: MQTT client disconnected.');
     }
   }
 }

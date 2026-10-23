@@ -7,6 +7,9 @@ Join a channel, tap out a message, and see what comes back. You can watch the te
 <img width="1781" height="1048" alt="image" src="https://github.com/user-attachments/assets/0d50d9e0-315e-44aa-9cfe-e91d52724cd6" />
 <img width="1781" height="1048" alt="image" src="https://github.com/user-attachments/assets/ca66708f-96f7-4a6d-a1f7-92b61748acbc" />
 
+## Disclaimer
+
+`tx.` uses a public MQTT broker for live communication. Messages and signals sent through the app may be visible to other people or accessible to third parties. Don't send anything private or sensitive. Use it as if anyone could be listening.
 
 ## How to use it
 

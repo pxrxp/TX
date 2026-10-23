@@ -217,24 +217,35 @@ connectBtn.addEventListener('click', async () => {
 
   landingError.classList.add('hidden');
   landingError.innerText = '';
+  connectBtn.disabled = true;
 
-  audio.init();
-  network.connect();
+  try {
+    audio.init();
+    peerAudio.init();
 
-  const available = await network.checkCallsignAvailability(targetChannel, chosenCallsign);
+    await network.connect();
 
-  if (!available) {
-    landingError.innerText = `callsign "${chosenCallsign}" is already taken in ${targetChannel}`;
+    const available = await network.checkCallsignAvailability(targetChannel, chosenCallsign);
+
+    if (!available) {
+      landingError.innerText = `callsign "${chosenCallsign}" is already taken in ${targetChannel}`;
+      landingError.classList.remove('hidden');
+      connectBtn.disabled = false;
+      return;
+    }
+
+    await network.joinRoom(targetChannel, chosenCallsign);
+    myCallsign = chosenCallsign;
+
+    landingView.classList.add('hidden');
+    activeView.classList.remove('hidden');
+    activeView.classList.add('flex');
+  } catch (err) {
+    landingError.innerText = 'failed to connect to telegraph broker. please try again.';
     landingError.classList.remove('hidden');
-    return;
+  } finally {
+    connectBtn.disabled = false;
   }
-
-  myCallsign = chosenCallsign;
-  network.joinRoom(targetChannel, myCallsign);
-
-  landingView.classList.add('hidden');
-  activeView.classList.remove('hidden');
-  activeView.classList.add('flex');
 });
 
 // Event Bindings
