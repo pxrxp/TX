@@ -29,6 +29,10 @@ const freqSlider = document.getElementById('freq-slider');
 const freqVal = document.getElementById('freq-val');
 const peerFreqSlider = document.getElementById('peer-freq-slider');
 const peerFreqVal = document.getElementById('peer-freq-val');
+const wpmSlider = document.getElementById('wpm-slider');
+const wpmVal = document.getElementById('wpm-val');
+const peerWpmSlider = document.getElementById('peer-wpm-slider');
+const peerWpmVal = document.getElementById('peer-wpm-val');
 
 const ROOMS = ['wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop', 'main-hub'];
 const PREFIXES = ['stn', 'spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal'];
@@ -54,6 +58,7 @@ const peerAudio = new AudioEngine(550);
 let myCallsign = callsignInput.value;
 let timeFormat = 'UTC';
 let showTranslation = true;
+let peerWpm = 18;
 
 const network = new NetworkManager(
   (action) => {
@@ -196,4 +201,16 @@ peerFreqSlider.addEventListener('input', (e) => {
   const val = e.target.value;
   peerFreqVal.innerText = `${val} hz`;
   peerAudio.setFrequency(parseInt(val, 10));
+});
+
+wpmSlider.addEventListener('input', (e) => {
+  const val = e.target.value;
+  wpmVal.innerText = `${val} wpm`;
+  decoder.setWPM(val);
+});
+
+peerWpmSlider.addEventListener('input', (e) => {
+  const val = e.target.value;
+  peerWpmVal.innerText = `${val} wpm`;
+  peerWpm = parseInt(val, 10);
 });
