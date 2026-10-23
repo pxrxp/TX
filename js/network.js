@@ -30,7 +30,7 @@ export class NetworkManager {
         } else if (topic.endsWith('/chat')) {
           this.onRemoteMessage(data.sender, data.rawMorse, data.decoded);
         }
-      } catch (e) { }
+      } catch (e) {}
     });
   }
 
@@ -52,7 +52,7 @@ export class NetworkManager {
             if (msg.callsign && msg.callsign.toLowerCase() === callsign.toLowerCase()) {
               isTaken = true;
             }
-          } catch (e) { }
+          } catch (e) {}
         }
       };
 
@@ -93,7 +93,7 @@ export class NetworkManager {
             if (data.query && data.query.toLowerCase() === this.callsign.toLowerCase()) {
               this.client.publish(`tx/${this.room}/presence/claim`, JSON.stringify({ callsign: this.callsign }));
             }
-          } catch (e) { }
+          } catch (e) {}
         }
       });
     }

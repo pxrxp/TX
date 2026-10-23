@@ -2,17 +2,25 @@ import { AudioEngine } from './audio.js';
 import { MorseDecoder } from './morse.js';
 import { NetworkManager } from './network.js';
 
+// Landing DOM
 const landingView = document.getElementById('station-landing-view');
 const callsignInput = document.getElementById('callsign-input');
 const roomInput = document.getElementById('room-input');
 const randomizeBtn = document.getElementById('randomize-btn');
 const connectBtn = document.getElementById('connect-btn');
 const landingError = document.getElementById('landing-error');
+const toggleCipherBtn = document.getElementById('toggle-cipher-btn');
 
+// Active Deck DOM
 const activeView = document.getElementById('wire-active-view');
+const topMorsePanel = document.getElementById('top-morse-panel');
 const settingsPanel = document.getElementById('settings-panel');
+const closeCipherBtn = document.getElementById('close-cipher-btn');
 const closeSettingsBtn = document.getElementById('close-settings-btn');
+const toggleCheat = document.getElementById('toggle-cheat');
+const toggleSfx = document.getElementById('toggle-sfx');
 const toggleSettings = document.getElementById('toggle-settings');
+const sfxIcon = document.getElementById('sfx-icon');
 const chatStream = document.getElementById('chat-stream');
 const morseBuffer = document.getElementById('morse-buffer');
 const decodedLiveRow = document.getElementById('decoded-live-row');
@@ -23,6 +31,7 @@ const sendTimerTrack = document.getElementById('send-timer-track');
 const sendTimerRing = document.getElementById('send-timer-ring');
 const telegraphKeyBed = document.getElementById('telegraph-key-bed');
 
+// Settings Controls
 const freqSlider = document.getElementById('freq-slider');
 const freqVal = document.getElementById('freq-val');
 const peerFreqSlider = document.getElementById('peer-freq-slider');
@@ -33,7 +42,12 @@ const peerWpmSlider = document.getElementById('peer-wpm-slider');
 const peerWpmVal = document.getElementById('peer-wpm-val');
 const transmitDelaySlider = document.getElementById('transmit-delay-slider');
 const transmitDelayVal = document.getElementById('transmit-delay-val');
+const transOnBtn = document.getElementById('trans-on-btn');
+const transOffBtn = document.getElementById('trans-off-btn');
+const clockUtcBtn = document.getElementById('clock-utc-btn');
+const clockLocalBtn = document.getElementById('clock-local-btn');
 
+// Channel Hubs & Callsigns
 const ROOMS = ['wire-01', 'wire-02', 'atlantic-line', 'relay-nord', 'brass-loop', 'main-hub'];
 const PREFIXES = ['stn', 'spark', 'brass', 'wire', 'relay', 'dash', 'key', 'signal'];
 
@@ -52,6 +66,7 @@ randomizeBtn.addEventListener('click', () => {
   roomInput.value = choices[Math.floor(Math.random() * choices.length)];
 });
 
+// Audio & State
 const audio = new AudioEngine(650);
 const peerAudio = new AudioEngine(550);
 
@@ -60,6 +75,7 @@ let timeFormat = 'UTC';
 let showTranslation = true;
 let peerWpm = 18;
 
+// Network Initialization
 const network = new NetworkManager(
   (action) => {
     if (action === 'DOWN') {
@@ -75,6 +91,7 @@ const network = new NetworkManager(
   }
 );
 
+// Decoder Setup
 const decoder = new MorseDecoder(
   (raw, decoded) => {
     morseBuffer.innerText = raw;
@@ -83,6 +100,7 @@ const decoder = new MorseDecoder(
   () => transmitMessage()
 );
 
+// Send Timer Animation
 let timerAnim = null;
 let timerStart = 0;
 const CIRCUMFERENCE = 125.66;
@@ -120,6 +138,15 @@ function formatMessageTime() {
   return d.toISOString().substring(11, 19) + ' utc';
 }
 
+function updateTranslationVisibility() {
+  if (decodedLiveRow) {
+    decodedLiveRow.style.display = showTranslation ? 'flex' : 'none';
+  }
+  document.querySelectorAll('.decoded-text-line').forEach(el => {
+    el.style.display = showTranslation ? 'block' : 'none';
+  });
+}
+
 function appendMessage(sender, rawMorse, decoded) {
   const timeStr = formatMessageTime();
   const isSelf = sender === myCallsign || sender === 'you';
@@ -149,6 +176,7 @@ function transmitMessage() {
   network.sendMessage(myCallsign, rawMorse, decoded);
 }
 
+// Telegraph Key Handlers
 let isKeyDown = false;
 
 function handleDown(e) {
@@ -182,6 +210,7 @@ function handleUp(e) {
   }
 }
 
+// Station Connect & Validation
 connectBtn.addEventListener('click', async () => {
   const chosenCallsign = callsignInput.value.trim().toLowerCase() || 'stn-74';
   const targetChannel = roomInput.value.trim().toLowerCase() || 'wire-01';
@@ -208,6 +237,7 @@ connectBtn.addEventListener('click', async () => {
   activeView.classList.add('flex');
 });
 
+// Event Bindings
 window.addEventListener('keydown', handleDown);
 window.addEventListener('keyup', handleUp);
 
@@ -221,12 +251,27 @@ clearBtn.addEventListener('click', () => {
 
 sendBtn.addEventListener('click', () => transmitMessage());
 
+// Overlay Menu Handlers
+toggleCipherBtn.addEventListener('click', () => {
+  settingsPanel.classList.add('hidden');
+  topMorsePanel.classList.toggle('hidden');
+});
+
+toggleCheat.addEventListener('click', () => {
+  settingsPanel.classList.add('hidden');
+  topMorsePanel.classList.toggle('hidden');
+});
+
+closeCipherBtn.addEventListener('click', () => topMorsePanel.classList.add('hidden'));
+
 toggleSettings.addEventListener('click', () => {
+  topMorsePanel.classList.add('hidden');
   settingsPanel.classList.toggle('hidden');
 });
 
 closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.add('hidden'));
 
+// Settings Event Bindings
 freqSlider.addEventListener('input', (e) => {
   const val = e.target.value;
   freqVal.innerText = `${val} hz`;
@@ -259,5 +304,53 @@ transmitDelaySlider.addEventListener('input', (e) => {
   } else {
     transmitDelayVal.innerText = `${val.toFixed(1)}s`;
     decoder.setAutoSendDelay(val * 1000);
+  }
+});
+
+transOnBtn.addEventListener('click', () => {
+  showTranslation = true;
+  transOnBtn.className = 'text-[#ffbe44] font-bold transition cursor-pointer lowercase';
+  transOffBtn.className = 'text-zinc-400 hover:text-white transition cursor-pointer lowercase';
+  updateTranslationVisibility();
+});
+
+transOffBtn.addEventListener('click', () => {
+  showTranslation = false;
+  transOffBtn.className = 'text-[#ffbe44] font-bold transition cursor-pointer lowercase';
+  transOnBtn.className = 'text-zinc-400 hover:text-white transition cursor-pointer lowercase';
+  updateTranslationVisibility();
+});
+
+clockUtcBtn.addEventListener('click', () => {
+  timeFormat = 'UTC';
+  clockUtcBtn.className = 'text-[#ffbe44] font-bold transition cursor-pointer lowercase';
+  clockLocalBtn.className = 'text-zinc-400 hover:text-white transition cursor-pointer lowercase';
+});
+
+clockLocalBtn.addEventListener('click', () => {
+  timeFormat = 'LOCAL';
+  clockLocalBtn.className = 'text-[#ffbe44] font-bold transition cursor-pointer lowercase';
+  clockUtcBtn.className = 'text-zinc-400 hover:text-white transition cursor-pointer lowercase';
+});
+
+toggleSfx.addEventListener('click', () => {
+  const muted = audio.toggleMute();
+  toggleSfx.classList.toggle('text-[#686f7c]', muted);
+  toggleSfx.classList.toggle('text-[#cbd3de]', !muted);
+
+  if (sfxIcon) {
+    if (muted) {
+      sfxIcon.innerHTML = `
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="22" y1="9" x2="16" y2="15"></line>
+        <line x1="16" y1="9" x2="22" y2="15"></line>
+      `;
+    } else {
+      sfxIcon.innerHTML = `
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path class="sfx-wave" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path class="sfx-wave" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      `;
+    }
   }
 });
